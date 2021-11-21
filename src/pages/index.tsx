@@ -10,9 +10,11 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main></main>
+      <main>
+        <div>{/* TODO チェックボックス実装 */}</div>
 
-      <footer></footer>
+        <div>{/* TODO 表実装 */}</div>
+      </main>
     </div>
   )
 }
