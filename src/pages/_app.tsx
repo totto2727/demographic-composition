@@ -13,7 +13,10 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       <Component {...pageProps} />
 
-      <footer>{/* TODO フッターを実装 */}</footer>
+      <footer>
+        {/* TODO フッターを実装 */}
+        フッター
+      </footer>
     </>
   )
 }

@@ -11,9 +11,12 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <div>{/* TODO チェックボックス実装 */}</div>
+        <div>
+          {/* TODO チェックボックス実装 */}
+          チェックボックス
+        </div>
 
-        <div>{/* TODO 表実装 */}</div>
+        <div>{/* TODO 表実装 */}表</div>
       </main>
     </div>
   )
