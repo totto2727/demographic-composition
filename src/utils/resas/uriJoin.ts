@@ -1,4 +1,4 @@
-export const UriJoin = (...args: string[]) =>
+export const uriJoin = (...args: string[]) =>
   args
     .join('/')
     .replace(/[/]+/g, '/')
