@@ -1,8 +1,8 @@
-import { URLJoin } from './URLJoin'
+import { UriJoin } from './UriJoin'
 
 describe('URL Join Testcase', () => {
   it('(Protocol+Host)+Path+Path+Query+Query', () => {
-    const result = URLJoin(
+    const result = UriJoin(
       'http://www.google.com',
       'a',
       '/b/cd',
@@ -14,8 +14,8 @@ describe('URL Join Testcase', () => {
     expect(result).toStrictEqual(expected)
   })
 
-  it('RESAS Request URL', () => {
-    const result = URLJoin(
+  it('RESAS Request URL Join Testcase', () => {
+    const result = UriJoin(
       'https://opendata.resas-portal.go.jp',
       'api/v1/prefectures'
     )
