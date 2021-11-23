@@ -1,44 +1,86 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosInstance } from 'axios'
 
-export type Prefecture = {
-  prefCode: number
-  prefName: string
-}
+import {
+  Prefecture,
+  RESASErrorRawResponse,
+  RESASErrorResponse,
+  RESASRawResponse,
+  RESASResponse,
+  isRESASErrorRawResponse,
+  isRESASSuccessRawResponse,
+} from './types'
 
-export type PrefecturesResponse = {
-  message?: string
-  result: Prefecture[]
-}
+/**
+ * RESAS APIのエンドポイント
+ */
+export const RESAS_ENDPOINT = 'https://opendata.resas-portal.go.jp'
 
-export type APIFailResponse =
-  | {
-      statusCode: string
-      message?: string
-      description?: string
-    }
-  | string
-  | undefined
-
-const RESAS_ENDPOINT = 'https://opendata.resas-portal.go.jp'
-
-const resasAxiosInstanse = axios.create({
+/**
+ * RESAS API用のAxios Instance
+ *
+ * 設定
+ * ・Base URLをRESAS APIのエンドポイントに固定した。
+ * ・Headerに環境変数から読み込んだAPI Keyを追加した。
+ *
+ * 注：環境変数の関係上、このインスタンスを利用した関数はNode.js上でしか動作せず、フロントエンド側から利用できない。
+ */
+export const resasAxiosInstanse: AxiosInstance = axios.create({
   baseURL: RESAS_ENDPOINT,
   headers: {
     'X-API-KEY': process.env.RESAS_API_KRY || '',
   },
 })
 
-export const getPrefectures: () => Promise<
-  PrefecturesResponse | APIFailResponse
-> = async () => {
-  const path = 'api/v1/prefectures'
-  try {
-    const response = await resasAxiosInstanse.get<PrefecturesResponse>(path)
-    return response.data
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      return (e as AxiosError<APIFailResponse>).response?.data
-    }
-    return undefined
-  }
+/**
+ * RESAS APIにリクエスト送る関数
+ *
+ * リクエストの例外処理について
+ * ・RESAS APIが処理に失敗した場合、isRESASErrorはtrueとなる。
+ * ・RESAS APIの結果に関わらず、例外が投げられた場合、isRESASErrorはfalseとなる。
+ *
+ * 注：RESAS APIの仕様では処理結果に関わらず、サーバーへのアクセスに成功すれば、レスポンスヘッダーは200 OKとなる。そのため、処理に失敗した場合でもAxiosの例外は発生しないことがある。
+ *
+ * @async
+ * @template T - 取得したい情報のJsonの型
+ * @param path - APIのリクエスト先（Endpointは省略）
+ * @return 結果
+ */
+const getRESAS = async <T>(path: string): Promise<RESASResponse<T>> => {
+  const res = await resasAxiosInstanse
+    .get<RESASRawResponse<T>>(path)
+    .then((res) => res.data)
+    .then((res): RESASResponse<T> => {
+      if (isRESASSuccessRawResponse<T>(res)) {
+        return { type: 'success', ...res }
+      } else if (isRESASErrorRawResponse(res)) {
+        return { type: 'error', isRESASError: true, response: res }
+      } else {
+        return { type: 'error', isRESASError: true }
+      }
+    })
+    .catch(
+      (
+        err: AxiosError<RESASErrorRawResponse | undefined>
+      ): RESASErrorResponse => {
+        return {
+          type: 'error',
+          isRESASError: false,
+          response: err?.response?.data,
+        }
+      }
+    )
+  return res
 }
+
+/**
+ * 都道府県一覧を取得するためのPath
+ */
+export const PREFECTURE_PATH = 'api/v1/prefectures'
+
+/**
+ * RESAS APIから都道府県一覧を取得するための関数
+ *
+ * @async
+ * @return 都道府県一覧
+ */
+export const getPrefectures = () => getRESAS<Prefecture[]>(PREFECTURE_PATH)
