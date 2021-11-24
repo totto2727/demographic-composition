@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios'
 import {
   Prefecture,
   RESASErrorRawResponse,
+  RESASErrorRawResponseRemovedNull,
   RESASErrorResponse,
   RESASRawResponse,
   RESASResponse,
@@ -32,6 +33,20 @@ export const resasAxiosInstanse: AxiosInstance = axios.create({
 })
 
 /**
+ * RESAS APIのレスポンス（失敗時）からnullを削除してundifinedに変更する関数（stringはそのまま）
+ *
+ * @param err - RESAS APIのレスポンス（失敗時）
+ * @return - RESAS APIのレスポンス（失敗時）からnullを削除してundifinedに変更した値
+ */
+export const removeNullFromErrorMessage: (
+  err: RESASErrorRawResponse
+) => RESASErrorRawResponseRemovedNull = (err) => {
+  return typeof err === 'object'
+    ? { ...err, message: err.message ?? undefined }
+    : err
+}
+
+/**
  * RESAS APIにリクエスト送る関数
  *
  * リクエストの例外処理について
@@ -43,17 +58,22 @@ export const resasAxiosInstanse: AxiosInstance = axios.create({
  * @async
  * @template T - 取得したい情報のJsonの型
  * @param path - APIのリクエスト先（Endpointは省略）
- * @return 結果
+ * @return リクエストの結果
  */
-const getRESAS = async <T>(path: string): Promise<RESASResponse<T>> => {
-  const res = await resasAxiosInstanse
+
+const getRESAS = <T>(path: string): Promise<RESASResponse<T>> =>
+  resasAxiosInstanse
     .get<RESASRawResponse<T>>(path)
     .then((res) => res.data)
     .then((res): RESASResponse<T> => {
       if (isRESASSuccessRawResponse<T>(res)) {
-        return { type: 'success', ...res }
+        return { type: 'success', ...res, message: res.message ?? undefined }
       } else if (isRESASErrorRawResponse(res)) {
-        return { type: 'error', isRESASError: true, response: res }
+        return {
+          type: 'error',
+          isRESASError: true,
+          response: removeNullFromErrorMessage(res),
+        }
       } else {
         return { type: 'error', isRESASError: true }
       }
@@ -62,15 +82,14 @@ const getRESAS = async <T>(path: string): Promise<RESASResponse<T>> => {
       (
         err: AxiosError<RESASErrorRawResponse | undefined>
       ): RESASErrorResponse => {
+        const res = err?.response?.data
         return {
           type: 'error',
           isRESASError: false,
-          response: err?.response?.data,
+          response: res && removeNullFromErrorMessage(res),
         }
       }
     )
-  return res
-}
 
 /**
  * 都道府県一覧を取得するためのPath

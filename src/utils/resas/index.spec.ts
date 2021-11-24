@@ -4,6 +4,7 @@ import {
   PREFECTURE_PATH,
   RESAS_ENDPOINT,
   getPrefectures,
+  removeNullFromErrorMessage,
   resasAxiosInstanse,
 } from '.'
 import RESAS_403_ERROR_RAW_RESPONSE from './__mock__/resas403ErrorRawResponse'
@@ -28,6 +29,7 @@ describe('RESAS API Request', () => {
     const expectResult: RESASSuccessResponse<Prefecture[]> = {
       type: 'success',
       ...data,
+      message: undefined,
     }
 
     mock.onGet(uriJoin(RESAS_ENDPOINT, PREFECTURE_PATH)).replyOnce(200, data)
@@ -41,7 +43,7 @@ describe('RESAS API Request', () => {
     const expectResult: RESASErrorResponse = {
       type: 'error',
       isRESASError: true,
-      response: data,
+      response: removeNullFromErrorMessage(data),
     }
 
     // RESAS APIのAPI Keyを間違えてた場合でも、レスポンスヘッダーは200 OKとなる
@@ -56,7 +58,7 @@ describe('RESAS API Request', () => {
     const expectResult: RESASErrorResponse = {
       type: 'error',
       isRESASError: false,
-      response: data,
+      response: removeNullFromErrorMessage(data),
     }
 
     // 429 Too Many Requests Errorの場合は、レスポンスヘッダーは429 Too Many Requestsとなる
