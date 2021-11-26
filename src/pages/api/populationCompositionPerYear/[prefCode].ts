@@ -16,7 +16,13 @@ const populationCompositionPerYearAPI = async (
   const populationCompositionPerYear = await getPopulationCompositionPerYear(
     Number(req.query.prefCode)
   )
-  res.status(200).json(populationCompositionPerYear)
+  if (populationCompositionPerYear.type === 'success') {
+    res.status(200).json(populationCompositionPerYear)
+  } else {
+    res
+      .status(populationCompositionPerYear.status ?? 400)
+      .json(populationCompositionPerYear)
+  }
 }
 
 export default populationCompositionPerYearAPI

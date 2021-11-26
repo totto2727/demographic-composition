@@ -12,7 +12,11 @@ const prefecturesAPI = async (
   res: NextApiResponse<RESASResponse<Prefecture[]>>
 ) => {
   const prefectures = await getPrefectures()
-  res.status(200).json(prefectures)
+  if (prefectures.type === 'success') {
+    res.status(200).json(prefectures)
+  } else {
+    res.status(prefectures.status ?? 400).json(prefectures)
+  }
 }
 
 export default prefecturesAPI
