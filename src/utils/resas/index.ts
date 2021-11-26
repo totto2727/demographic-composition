@@ -62,7 +62,6 @@ export const removeNullFromErrorMessage: (
  * @param params - 省略可：Axiosの設定（クエリパラメータなど）
  * @return リクエストの結果
  */
-
 const getRESAS = <T>(
   path: string,
   params?: AxiosRequestConfig
@@ -108,3 +107,23 @@ export const PREFECTURE_PATH = 'api/v1/prefectures'
  * @return 都道府県一覧
  */
 export const getPrefectures = () => getRESAS<Prefecture[]>(PREFECTURE_PATH)
+
+/**
+ * 都道府県の人口情報を取得するためのPath
+ */
+export const POPULATION_COMPOSITION_PER_YEAR_PATH =
+  'api/v1/population/composition/perYear'
+
+/**
+ * RESAS APIから各都道府県の人口情報を取得するための関数
+ *
+ * @async
+ * @param prefCode - 都道府県番号
+ * @return 引数で指定した都道府県の人口情報
+ */
+export const getPopulationCompositionPerYear: (
+  prefCode: Prefecture['prefCode']
+) => Promise<RESASResponse<PopulationCompositionPerYear>> = (prefCode) =>
+  getRESAS<PopulationCompositionPerYear>(POPULATION_COMPOSITION_PER_YEAR_PATH, {
+    params: { prefCode, cityCode: '-' },
+  })
