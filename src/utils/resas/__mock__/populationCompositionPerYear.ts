@@ -1,6 +1,6 @@
-import { PopulationCompositionPerYear, RESASRawResponse } from '../types'
+import { PopulationCompositionPerYear, RESASSuccessRawResponse } from '../types'
 
-const populationCompositionPerYear: RESASRawResponse<PopulationCompositionPerYear> =
+const POPULATION_COMPOSITION_PER_YEAR: RESASSuccessRawResponse<PopulationCompositionPerYear> =
   {
     message: null,
     result: {
@@ -102,4 +102,4 @@ const populationCompositionPerYear: RESASRawResponse<PopulationCompositionPerYea
     },
   }
 
-export default populationCompositionPerYear
+export default POPULATION_COMPOSITION_PER_YEAR

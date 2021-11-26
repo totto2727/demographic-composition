@@ -1,17 +1,23 @@
 import MockAdapter from 'axios-mock-adapter'
 
 import {
+  POPULATION_COMPOSITION_PER_YEAR_PATH,
   PREFECTURE_PATH,
-  RESAS_ENDPOINT,
+  getPopulationCompositionPerYear,
   getPrefectures,
   removeNullFromErrorMessage,
   resasAxiosInstanse,
 } from '.'
+import POPULATION_COMPOSITION_PER_YEAR from './__mock__/populationCompositionPerYear'
 import RESAS_403_ERROR_RAW_RESPONSE from './__mock__/resas403ErrorRawResponse'
 import RESAS_429_ERROR_RAW_RESPONSE from './__mock__/resas429ErrorRawResponse'
 import RESAS_SUCCESS_RAW_RESPONSE from './__mock__/resasSuccessRawResponse'
-import { Prefecture, RESASErrorResponse, RESASSuccessResponse } from './types'
-import { uriJoin } from './uriJoin'
+import {
+  PopulationCompositionPerYear,
+  Prefecture,
+  RESASErrorResponse,
+  RESASSuccessResponse,
+} from './types'
 
 describe('RESAS API Request', () => {
   let mock: MockAdapter
@@ -32,7 +38,7 @@ describe('RESAS API Request', () => {
       message: undefined,
     }
 
-    mock.onGet(uriJoin(RESAS_ENDPOINT, PREFECTURE_PATH)).replyOnce(200, data)
+    mock.onGet(PREFECTURE_PATH).replyOnce(200, data)
 
     const result = await getPrefectures()
     expect(result).toStrictEqual(expectResult)
@@ -47,7 +53,7 @@ describe('RESAS API Request', () => {
     }
 
     // RESAS APIのAPI Keyを間違えてた場合でも、レスポンスヘッダーは200 OKとなる
-    mock.onGet(uriJoin(RESAS_ENDPOINT, PREFECTURE_PATH)).replyOnce(200, data)
+    mock.onGet(PREFECTURE_PATH).replyOnce(200, data)
 
     const result = await getPrefectures()
     expect(result).toStrictEqual(expectResult)
@@ -62,11 +68,30 @@ describe('RESAS API Request', () => {
     }
 
     // 429 Too Many Requests Errorの場合は、レスポンスヘッダーは429 Too Many Requestsとなる
-    mock.onGet(uriJoin(RESAS_ENDPOINT, PREFECTURE_PATH)).replyOnce(429, data)
+    mock.onGet(PREFECTURE_PATH).replyOnce(429, data)
 
     const result = await getPrefectures()
     expect(result).toStrictEqual(expectResult)
   })
-})
 
-// TODO エラー時のテスト追加
+  it('Succeeded to access the server:Request Population Composition Per Year Success Testcase', async () => {
+    const data = POPULATION_COMPOSITION_PER_YEAR
+    const expectResult: RESASSuccessResponse<PopulationCompositionPerYear> = {
+      type: 'success',
+      ...data,
+      message: undefined,
+    }
+
+    mock
+      .onGet(POPULATION_COMPOSITION_PER_YEAR_PATH, {
+        params: {
+          prefCode: 1,
+          cityCode: '-',
+        },
+      })
+      .replyOnce(200, data)
+
+    const result = await getPopulationCompositionPerYear(1)
+    expect(result).toStrictEqual(expectResult)
+  })
+})
