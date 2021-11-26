@@ -1,11 +1,11 @@
 import type { AppProps } from 'next/app'
 import React from 'react'
 
-import './_app.css'
+import './global.css'
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <>
+    <div>
       <header>
         {/* TODO ヘッダーを実装*/}
         ヘッダー
@@ -17,7 +17,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         {/* TODO フッターを実装 */}
         フッター
       </footer>
-    </>
+    </div>
   )
 }
 
