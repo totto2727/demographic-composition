@@ -5,7 +5,6 @@ import {
   PREFECTURE_PATH,
   getPopulationCompositionPerYear,
   getPrefectures,
-  removeNullFromErrorMessage,
   resasAxiosInstanse,
 } from '.'
 import POPULATION_COMPOSITION_PER_YEAR from './__mock__/populationCompositionPerYear'
@@ -49,7 +48,7 @@ describe('RESAS API Request', () => {
     const expectResult: RESASErrorResponse = {
       type: 'error',
       isRESASError: true,
-      response: removeNullFromErrorMessage(data),
+      status: Number(data.statusCode),
     }
 
     // RESAS APIのAPI Keyを間違えてた場合でも、レスポンスヘッダーは200 OKとなる
@@ -64,7 +63,7 @@ describe('RESAS API Request', () => {
     const expectResult: RESASErrorResponse = {
       type: 'error',
       isRESASError: false,
-      response: removeNullFromErrorMessage(data),
+      status: 429,
     }
 
     // 429 Too Many Requests Errorの場合は、レスポンスヘッダーは429 Too Many Requestsとなる

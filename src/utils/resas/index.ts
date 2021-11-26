@@ -3,8 +3,6 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
 import {
   PopulationCompositionPerYear,
   Prefecture,
-  RESASErrorRawResponse,
-  RESASErrorRawResponseRemovedNull,
   RESASErrorResponse,
   RESASRawResponse,
   RESASResponse,
@@ -34,20 +32,6 @@ export const resasAxiosInstanse: AxiosInstance = axios.create({
 })
 
 /**
- * RESAS APIのレスポンスからnullを削除してundifinedに変更する関数（stringはそのまま）
- *
- * @param err - RESAS APIのレスポンス（失敗時）
- * @return - RESAS APIのレスポンス（失敗時）からnullを削除してundifinedに変更した値
- */
-export const removeNullFromErrorMessage: (
-  err: RESASErrorRawResponse
-) => RESASErrorRawResponseRemovedNull = (err) => {
-  return typeof err === 'object'
-    ? { ...err, message: err.message ?? undefined }
-    : err
-}
-
-/**
  * RESAS APIにリクエスト送る関数
  *
  * リクエストの例外処理について
@@ -68,31 +52,29 @@ const getRESAS = <T>(
 ): Promise<RESASResponse<T>> =>
   resasAxiosInstanse
     .get<RESASRawResponse<T>>(path, params)
-    .then((res) => res.data)
     .then((res): RESASResponse<T> => {
-      if (isRESASSuccessRawResponse<T>(res)) {
-        return { type: 'success', ...res, message: res.message ?? undefined }
-      } else if (isRESASErrorRawResponse(res)) {
+      const data = res.data
+      if (isRESASSuccessRawResponse(data)) {
+        return {
+          type: 'success',
+          message: data.message || undefined,
+          result: data.result,
+        }
+      } else if (isRESASErrorRawResponse(data)) {
         return {
           type: 'error',
           isRESASError: true,
-          response: removeNullFromErrorMessage(res),
+          status: Number(typeof data === 'string' ? data : data.statusCode),
         }
-      } else {
-        return { type: 'error', isRESASError: true }
       }
+      return { type: 'error', isRESASError: true, status: undefined }
     })
     .catch(
-      (
-        err: AxiosError<RESASErrorRawResponse | undefined>
-      ): RESASErrorResponse => {
-        const res = err?.response?.data
-        return {
-          type: 'error',
-          isRESASError: false,
-          response: res && removeNullFromErrorMessage(res),
-        }
-      }
+      (err: AxiosError): RESASErrorResponse => ({
+        type: 'error',
+        isRESASError: false,
+        status: err.response?.status,
+      })
     )
 
 /**

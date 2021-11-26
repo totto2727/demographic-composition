@@ -3,7 +3,7 @@
  *
  * @template T - 取得したい情報のJsonの型
  */
-export type RESASSuccessRawResponse<T = void> = {
+export type RESASSuccessRawResponse<T> = {
   message: string | null
   result: T
 }
@@ -15,7 +15,7 @@ export type RESASSuccessRawResponse<T = void> = {
  *
  * @template T - 取得したい情報のJsonの型
  */
-export type RESASSuccessResponse<T = void> = Omit<
+export type RESASSuccessResponse<T> = Omit<
   RESASSuccessRawResponse<T>,
   'message'
 > & {
@@ -28,25 +28,14 @@ export type RESASSuccessResponse<T = void> = Omit<
  */
 export type RESASErrorRawResponse =
   | {
-      statusCode?: string
+      statusCode: string
       message: string | null
-      description?: string
+      description: string
     }
   | string
 
 /**
- * RESAS APIのレスポンス（失敗時）の型からnullを削除しundifinedに変更した型
- */
-export type RESASErrorRawResponseRemovedNull =
-  | (Omit<Exclude<RESASErrorRawResponse, string>, 'message'> & {
-      message?: string
-    })
-  | string
-
-/**
  * 429 Too Many Requestsや通信の失敗によるエラーを含んだRESAS APIのレスポンス（失敗時）の型
- *
- * APIのレスポンス（RESASErrorRawResponse）は直接扱わず、この型で処理を行う。
  *
  * isRESASErrorはRESAS APIの処理に失敗（API KeyやPathが正しくない）した場合trueとする。
  * 一方で429 Too Many Requestsや通信の失敗によるエラーはfalseとなる。
@@ -54,7 +43,7 @@ export type RESASErrorRawResponseRemovedNull =
 export type RESASErrorResponse = {
   type: 'error'
   isRESASError: boolean
-  response?: RESASErrorRawResponseRemovedNull
+  status?: number
 }
 
 /**
@@ -62,7 +51,7 @@ export type RESASErrorResponse = {
  *
  * @template T - 取得したい情報のJsonの型
  */
-export type RESASRawResponse<T = void> =
+export type RESASRawResponse<T> =
   | RESASSuccessRawResponse<T>
   | RESASErrorRawResponse
 
@@ -73,7 +62,7 @@ export type RESASRawResponse<T = void> =
  * @param res - RESAS APIのレスポンス
  * @return 型ガードの結果
  */
-export const isRESASSuccessRawResponse = <T = void>(
+export const isRESASSuccessRawResponse = <T>(
   res: RESASRawResponse<T>
 ): res is RESASSuccessRawResponse<T> => {
   return typeof res === 'object' && 'message' in res && 'result' in res
@@ -85,8 +74,8 @@ export const isRESASSuccessRawResponse = <T = void>(
  * @param res - RESAS APIのレスポンス
  * @return 型ガードの結果
  */
-export const isRESASErrorRawResponse = (
-  res: RESASRawResponse
+export const isRESASErrorRawResponse = <T = unknown>(
+  res: RESASRawResponse<T>
 ): res is RESASErrorRawResponse => {
   return (
     typeof res === 'string' ||
