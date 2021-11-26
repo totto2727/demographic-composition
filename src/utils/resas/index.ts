@@ -1,6 +1,7 @@
-import axios, { AxiosError, AxiosInstance } from 'axios'
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
 
 import {
+  PopulationCompositionPerYear,
   Prefecture,
   RESASErrorRawResponse,
   RESASErrorRawResponseRemovedNull,
@@ -33,7 +34,7 @@ export const resasAxiosInstanse: AxiosInstance = axios.create({
 })
 
 /**
- * RESAS APIのレスポンス（失敗時）からnullを削除してundifinedに変更する関数（stringはそのまま）
+ * RESAS APIのレスポンスからnullを削除してundifinedに変更する関数（stringはそのまま）
  *
  * @param err - RESAS APIのレスポンス（失敗時）
  * @return - RESAS APIのレスポンス（失敗時）からnullを削除してundifinedに変更した値
@@ -58,12 +59,16 @@ export const removeNullFromErrorMessage: (
  * @async
  * @template T - 取得したい情報のJsonの型
  * @param path - APIのリクエスト先（Endpointは省略）
+ * @param params - 省略可：Axiosの設定（クエリパラメータなど）
  * @return リクエストの結果
  */
 
-const getRESAS = <T>(path: string): Promise<RESASResponse<T>> =>
+const getRESAS = <T>(
+  path: string,
+  params?: AxiosRequestConfig
+): Promise<RESASResponse<T>> =>
   resasAxiosInstanse
-    .get<RESASRawResponse<T>>(path)
+    .get<RESASRawResponse<T>>(path, params)
     .then((res) => res.data)
     .then((res): RESASResponse<T> => {
       if (isRESASSuccessRawResponse<T>(res)) {
