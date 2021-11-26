@@ -98,6 +98,7 @@ export const isRESASErrorRawResponse = (
 
 /**
  * 429 Too Many Requestsや通信の失敗によるエラーを含んだRESAS APIのレスポンスの型
+ *
  * @template T - 取得したい情報のJsonの型
  */
 export type RESASResponse<T = void> =
@@ -106,6 +107,7 @@ export type RESASResponse<T = void> =
 
 /**
  * 都道府県情報の型
+ *
  * @property prefCode - RESAS APIで各都道府県の情報をリクエストするためのID
  * @property prefCode - 都道府県名
  */
@@ -114,17 +116,50 @@ export type Prefecture = {
   prefName: string
 }
 
+/**
+ * 都道府県の人口情報の型
+ *
+ * @property year - 記録した年
+ * @property value - 人口
+ */
 export type PopulationCompositionItem = {
   year: number
   value: number
-  rate?: number
 }
 
-export type PopulationCompositionItems = {
-  label: '総人口' | '年少人口' | '生産年齢人口' | '老年人口'
-  data: PopulationCompositionItem[]
+/**
+ * 総人口に対する割合を含んだ都道府県の人口情報の型
+ *
+ * @property rate - 総人口に対する割合
+ */
+export type PopulationCompositionItemWithRate = PopulationCompositionItem & {
+  rate: number
 }
 
+/**
+ * ラベル付けした都道府県の人口情報の型
+ *
+ * labelが総人口の場合、rate（総人口に対する割合）を持たない
+ *
+ * @property label - 人口情報のラベル
+ * @property data - 各年の人口情報の配列
+ */
+export type PopulationCompositionItems =
+  | {
+      label: '年少人口' | '生産年齢人口' | '老年人口'
+      data: PopulationCompositionItemWithRate[]
+    }
+  | {
+      label: '総人口'
+      data: PopulationCompositionItem[]
+    }
+
+/**
+ * 実績値と推計値の区切り年を含んだ都道府県の人口情報の型
+ *
+ * @property boundaryYear - 実績値と推計値の区切り年
+ * @property data - ラベル付けした都道府県の人口情報の型
+ */
 export type PopulationCompositionPerYear = {
   boundaryYear: number
   data: PopulationCompositionItems[]
