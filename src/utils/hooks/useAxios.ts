@@ -21,4 +21,18 @@ const useAxios = <T>(url: string) => {
   }
 }
 
+/**
+ * 都道府県一覧をリクエストするためのフロントエンド用APIのPath
+ */
+export const PREFETURES_FRONTEND_PATH = '/api/prefectures'
+
+/**
+ * 都道府県の人口情報をリクエストするためのフロントエンド用APIのPath
+ *
+ * 利用する際はこのパスに、都道府県番号を付け加える
+ * 例：/api/populationCompositionPerYear/1000
+ */
+export const POPULATION_COMPOSITION_PER_YEAR_FRONTEND_PATH =
+  '/api/populationCompositionPerYear/'
+
 export default useAxios
