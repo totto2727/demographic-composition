@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import useCheckedPrefecture from 'utils/hooks/useCheckedPrefectures'
 import { Prefecture } from 'utils/resas/types'
 
@@ -17,10 +17,14 @@ const PrefectureCheckbox: React.FC<{
   isChecked: boolean
   checkPrefecture: ReturnType<typeof useCheckedPrefecture>['checkPrefecture']
 }> = ({ prefecture, isChecked, checkPrefecture }) => {
+  const [disabled, setDisabled] = useState(false)
+
   const id = `input-${prefecture.prefCode}-${prefecture.prefName}`
 
   const handleChange = useCallback(() => {
+    setDisabled(true)
     checkPrefecture(prefecture)
+    setDisabled(false)
   }, [checkPrefecture, prefecture])
 
   return (
@@ -30,8 +34,13 @@ const PrefectureCheckbox: React.FC<{
         type='checkbox'
         checked={isChecked}
         onChange={handleChange}
+        disabled={disabled}
       />
-      <label className={styles['prefecture-checkbox-label']} htmlFor={id}>
+      <label
+        className={`${styles['prefecture-checkbox-label']}`}
+        htmlFor={id}
+        style={{ opacity: disabled ? 0.5 : 1 }}
+      >
         {prefecture.prefName}
       </label>
     </div>
@@ -49,7 +58,10 @@ const PrefectureCheckbox: React.FC<{
 const PrefectureCheckboxes: React.FC<
   {
     prefectures: Prefecture[]
-  } & Omit<ReturnType<typeof useCheckedPrefecture>, 'checkedPrefectures'>
+  } & Pick<
+    ReturnType<typeof useCheckedPrefecture>,
+    'checkPrefecture' | 'isCheckedPrefecture'
+  >
 > = ({ prefectures, checkPrefecture, isCheckedPrefecture }) => {
   const checkboxes = prefectures.map((prefecture) => (
     <PrefectureCheckbox

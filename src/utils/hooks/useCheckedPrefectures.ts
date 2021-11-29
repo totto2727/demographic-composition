@@ -1,5 +1,12 @@
+import axios from 'axios'
 import { useCallback, useState } from 'react'
-import { Prefecture } from 'utils/resas/types'
+import {
+  PopulationCompositionPerYear,
+  Prefecture,
+  RESASResponse,
+} from 'utils/resas/types'
+
+import { POPULATION_COMPOSITION_PER_YEAR_FRONTEND_PATH } from './useAxios'
 
 /**
  * 都道府県のチェックボックスの状態を管理するためのカスタムフック
@@ -13,6 +20,12 @@ const useCheckedPrefecture = () => {
   const [checkedPrefectures, setCheckedPrefectures] = useState<
     Prefecture['prefCode'][]
   >([])
+
+  /**
+   * 取得した人口情報の格納先
+   */
+  const [populationCompositionPerYear, setPopulationCompositionPerYear] =
+    useState<{ [key: number]: PopulationCompositionPerYear }>({})
 
   /**
    * 引数にとった都道府県がチェックされているか判定する関数
@@ -32,21 +45,60 @@ const useCheckedPrefecture = () => {
    * checkedPrefecturesに含まれていなければ追加する。
    * 含まれていた場合は削除する。
    *
+   * チェックした都道府県の人口情報がなければ、RESAS APIから取得する
+   * すでに取得済みの場合は通信は行わない
+   *
    * @param param.prefCode - 都道府県番号
    */
   const checkPrefecture = useCallback(
     ({ prefCode }: Pick<Prefecture, 'prefCode'>) => {
       if (isCheckedPrefecture({ prefCode })) {
         setCheckedPrefectures(checkedPrefectures.filter((v) => v !== prefCode))
-      } else {
-        setCheckedPrefectures([...checkedPrefectures, prefCode])
+        return
       }
+
+      if (prefCode in populationCompositionPerYear) {
+        setCheckedPrefectures([...checkedPrefectures, prefCode].sort())
+        return
+      }
+
+      const request = () =>
+        axios
+          .get<RESASResponse<{ [key: number]: PopulationCompositionPerYear }>>(
+            POPULATION_COMPOSITION_PER_YEAR_FRONTEND_PATH,
+            {
+              params: { prefCode: [prefCode] },
+            }
+          )
+          .then((res) => {
+            if (res.data.type === 'error') {
+              alert('通信エラー：もう一度選択してください')
+              return
+            }
+            setPopulationCompositionPerYear({
+              ...populationCompositionPerYear,
+              ...res.data.result,
+            })
+            setCheckedPrefectures([...checkedPrefectures, prefCode].sort())
+          })
+          .catch(() => {
+            alert('通信エラー：もう一度選択してください')
+          })
+
+      void request()
     },
-    [checkedPrefectures, isCheckedPrefecture]
+    [checkedPrefectures, isCheckedPrefecture, populationCompositionPerYear]
+  )
+
+  const populationPerYear: { [key: number]: PopulationCompositionPerYear } = {}
+  checkedPrefectures.forEach(
+    (prefCode) =>
+      (populationPerYear[prefCode] = populationCompositionPerYear[prefCode])
   )
 
   return {
     checkedPrefectures,
+    populationPerYear,
     isCheckedPrefecture,
     checkPrefecture,
   }
