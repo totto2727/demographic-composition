@@ -1,0 +1,10 @@
+.prefecture-checkboxes {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+
+.prefecture-checkbox-label {
+  min-width: 4rem;
+}
