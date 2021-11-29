@@ -1,7 +1,16 @@
+import PrefectureCheckboxes from 'components/prefecture-checkboxes'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import useAxios, { PREFETURES_FRONTEND_PATH } from 'utils/hooks/useAxios'
+import useCheckedPrefectures from 'utils/hooks/useCheckedPrefectures'
+import { Prefecture, RESASSuccessResponse } from 'utils/resas/types'
 
 const Home: NextPage = () => {
+  const { data, isError, isLoading } = useAxios<
+    RESASSuccessResponse<Prefecture[]>
+  >(PREFETURES_FRONTEND_PATH)
+  const { checkedPrefectures, ...func } = useCheckedPrefectures()
+
   return (
     <div>
       <Head>
@@ -12,8 +21,11 @@ const Home: NextPage = () => {
 
       <main>
         <div>
-          {/* TODO チェックボックス実装 */}
-          チェックボックス
+          {data ? (
+            <PrefectureCheckboxes prefectures={data.result} {...func} />
+          ) : (
+            <></>
+          )}
         </div>
 
         <div>{/* TODO 表実装 */}表</div>
