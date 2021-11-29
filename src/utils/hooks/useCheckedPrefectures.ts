@@ -1,30 +1,54 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Prefecture } from 'utils/resas/types'
 
 /**
  * 都道府県のチェックボックスの状態を管理するためのカスタムフック
  *
- * return {チェックした都道府県の番号、チェック関数、アンチェック関数、チェック確認関数}
+ * return {チェックした都道府県の番号、チェック関数、チェック判定関数}
  */
 const useCheckedPrefecture = () => {
+  /**
+   * チェックした都道府県の番号を記録する配列
+   */
   const [checkedPrefectures, setCheckedPrefectures] = useState<
     Prefecture['prefCode'][]
   >([])
 
-  const checkPrefectures = ({ prefCode }: Prefecture) =>
-    setCheckedPrefectures([...checkedPrefectures, prefCode])
+  /**
+   * 引数にとった都道府県がチェックされているか判定する関数
+   *
+   * @param param.prefCode - 都道府県番号
+   * @return 判定結果（checkedPrefecturesに含まれているか）
+   */
+  const isCheckedPrefecture = useCallback(
+    ({ prefCode }: Pick<Prefecture, 'prefCode'>) =>
+      checkedPrefectures.includes(prefCode),
+    [checkedPrefectures]
+  )
 
-  const unCheckedPrefectures = ({ prefCode }: Prefecture) =>
-    setCheckedPrefectures(checkedPrefectures.filter((v) => v !== prefCode))
-
-  const isCheckedPrefecture = ({ prefCode }: Prefecture) =>
-    prefCode in checkedPrefectures
+  /**
+   * 引数にとった都道府県をチェック（アンチェック）する関数
+   *
+   * checkedPrefecturesに含まれていなければ追加する。
+   * 含まれていた場合は削除する。
+   *
+   * @param param.prefCode - 都道府県番号
+   */
+  const checkPrefecture = useCallback(
+    ({ prefCode }: Pick<Prefecture, 'prefCode'>) => {
+      if (isCheckedPrefecture({ prefCode })) {
+        setCheckedPrefectures(checkedPrefectures.filter((v) => v !== prefCode))
+      } else {
+        setCheckedPrefectures([...checkedPrefectures, prefCode])
+      }
+    },
+    [checkedPrefectures, isCheckedPrefecture]
+  )
 
   return {
     checkedPrefectures,
     isCheckedPrefecture,
-    checkPrefectures,
-    unCheckedPrefectures,
+    checkPrefecture,
   }
 }
 
