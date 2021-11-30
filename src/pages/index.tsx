@@ -39,8 +39,7 @@ const Home: NextPage = () => {
 
         <div>
           <PopulationPerYearChart
-            data={populationPerYear}
-            checkedPrefectures={checkedPrefectures}
+            populationPerYear={populationPerYear}
             prefectures={prefectures}
           />
         </div>
