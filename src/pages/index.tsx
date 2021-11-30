@@ -1,3 +1,4 @@
+import PopulationPerYearChart from 'components/population-per-year-chart'
 import PrefectureCheckboxes from 'components/prefecture-checkboxes'
 import type { NextPage } from 'next'
 import Head from 'next/head'
@@ -6,10 +7,16 @@ import useCheckedPrefectures from 'utils/hooks/useCheckedPrefectures'
 import { Prefecture, RESASSuccessResponse } from 'utils/resas/types'
 
 const Home: NextPage = () => {
-  const { data, isError, isLoading } = useAxios<
-    RESASSuccessResponse<Prefecture[]>
-  >(PREFETURES_FRONTEND_PATH)
-  const { checkedPrefectures, ...func } = useCheckedPrefectures()
+  const { checkedPrefectures, populationPerYear, ...func } =
+    useCheckedPrefectures()
+
+  const {
+    data,
+    isError: prefecturesIsError,
+    isLoading: prefectureIsLoading,
+  } = useAxios<RESASSuccessResponse<Prefecture[]>>(PREFETURES_FRONTEND_PATH)
+
+  const prefectures = data ? data.result : []
 
   return (
     <div>
@@ -23,12 +30,20 @@ const Home: NextPage = () => {
         <div>
           {data ? (
             <PrefectureCheckboxes prefectures={data.result} {...func} />
+          ) : prefectureIsLoading ? (
+            <>読込中</>
           ) : (
-            <></>
+            <>エラー</>
           )}
         </div>
 
-        <div>{/* TODO 表実装 */}表</div>
+        <div>
+          <PopulationPerYearChart
+            data={populationPerYear}
+            checkedPrefectures={checkedPrefectures}
+            prefectures={prefectures}
+          />
+        </div>
       </main>
     </div>
   )
