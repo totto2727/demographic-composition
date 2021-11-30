@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import useCheckedPrefecture from 'utils/hooks/useCheckedPrefectures'
 import { Prefecture } from 'utils/resas/types'
 
