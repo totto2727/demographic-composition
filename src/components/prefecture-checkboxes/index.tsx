@@ -17,14 +17,10 @@ const PrefectureCheckbox: React.FC<{
   isChecked: boolean
   checkPrefecture: ReturnType<typeof useCheckedPrefecture>['checkPrefecture']
 }> = ({ prefecture, isChecked, checkPrefecture }) => {
-  const [disabled, setDisabled] = useState(false)
-
   const id = `input-${prefecture.prefCode}-${prefecture.prefName}`
 
   const handleChange = useCallback(() => {
-    setDisabled(true)
     checkPrefecture(prefecture)
-    setDisabled(false)
   }, [checkPrefecture, prefecture])
 
   return (
@@ -34,13 +30,8 @@ const PrefectureCheckbox: React.FC<{
         type='checkbox'
         checked={isChecked}
         onChange={handleChange}
-        disabled={disabled}
       />
-      <label
-        className={`${styles['prefecture-checkbox-label']}`}
-        htmlFor={id}
-        style={{ opacity: disabled ? 0.5 : 1 }}
-      >
+      <label className={`${styles['prefecture-checkbox-label']}`} htmlFor={id}>
         {prefecture.prefName}
       </label>
     </div>

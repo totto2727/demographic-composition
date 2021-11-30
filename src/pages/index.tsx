@@ -7,14 +7,11 @@ import useCheckedPrefectures from 'utils/hooks/useCheckedPrefectures'
 import { Prefecture, RESASSuccessResponse } from 'utils/resas/types'
 
 const Home: NextPage = () => {
-  const { checkedPrefectures, populationPerYear, ...func } =
-    useCheckedPrefectures()
+  const { populationPerYear, ...func } = useCheckedPrefectures()
 
-  const {
-    data,
-    isError: prefecturesIsError,
-    isLoading: prefectureIsLoading,
-  } = useAxios<RESASSuccessResponse<Prefecture[]>>(PREFETURES_FRONTEND_PATH)
+  const { data, isLoading } = useAxios<RESASSuccessResponse<Prefecture[]>>(
+    PREFETURES_FRONTEND_PATH
+  )
 
   const prefectures = data ? data.result : []
 
@@ -30,7 +27,7 @@ const Home: NextPage = () => {
         <div>
           {data ? (
             <PrefectureCheckboxes prefectures={data.result} {...func} />
-          ) : prefectureIsLoading ? (
+          ) : isLoading ? (
             <>読込中</>
           ) : (
             <>エラー</>
