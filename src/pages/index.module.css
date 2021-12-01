@@ -1,0 +1,28 @@
+.checkboxes {
+  border: solid 1px #282828;
+  height: fit-content;
+  max-width: 576px;
+  margin: auto
+}
+
+.chart {
+  max-height: min-content;
+}
+
+@media screen and (min-width: 1024px) {
+  .container {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
+  .checkboxes {
+    flex: 1;
+    border: solid 1px #282828;
+  }
+
+  .chart {
+    flex: 2;
+    height: 90vh;
+    flex-shrink: 1;
+  }
+}
