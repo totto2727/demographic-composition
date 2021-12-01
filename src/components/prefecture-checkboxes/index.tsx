@@ -1,3 +1,4 @@
+import React from 'react'
 import { useCallback } from 'react'
 import useCheckedPrefecture from 'utils/hooks/useCheckedPrefectures'
 import { Prefecture } from 'utils/resas/types'
@@ -20,7 +21,7 @@ const PrefectureCheckbox: React.FC<{
   const id = `input-${prefecture.prefCode}-${prefecture.prefName}`
 
   const handleChange = useCallback(() => {
-    checkPrefecture(prefecture)
+    void checkPrefecture(prefecture)()
   }, [checkPrefecture, prefecture])
 
   return (
@@ -54,8 +55,10 @@ const PrefectureCheckboxes: React.FC<
     'checkPrefecture' | 'isCheckedPrefecture'
   >
 > = ({ prefectures, checkPrefecture, isCheckedPrefecture }) => {
+  const PrefectureCheckboxMemo = React.memo(PrefectureCheckbox)
+
   const checkboxes = prefectures.map((prefecture) => (
-    <PrefectureCheckbox
+    <PrefectureCheckboxMemo
       prefecture={prefecture}
       checkPrefecture={checkPrefecture}
       isChecked={isCheckedPrefecture(prefecture)}
