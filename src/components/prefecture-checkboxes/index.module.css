@@ -3,8 +3,14 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 0.25rem 0.5rem;
+  justify-content: center;
 }
 
 .prefecture-checkbox-label {
-  min-width: 4rem;
+  min-width: 5rem;
+  cursor: pointer;
+}
+
+.prefecture-checkbox-label input {
+  margin-right: 0.25rem;
 }

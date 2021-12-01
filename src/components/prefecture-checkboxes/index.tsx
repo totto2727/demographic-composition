@@ -25,13 +25,14 @@ const PrefectureCheckbox: React.FC<{
 
   return (
     <div>
-      <input
-        id={id}
-        type='checkbox'
-        checked={isChecked}
-        onChange={handleChange}
-      />
       <label className={`${styles['prefecture-checkbox-label']}`} htmlFor={id}>
+        <input
+          id={id}
+          className={styles['prefecture-checkbox-input']}
+          type='checkbox'
+          checked={isChecked}
+          onChange={handleChange}
+        />
         {prefecture.prefName}
       </label>
     </div>
