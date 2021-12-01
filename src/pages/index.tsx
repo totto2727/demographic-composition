@@ -1,5 +1,6 @@
 import PopulationPerYearChart from 'components/population-per-year-chart'
 import PrefectureCheckboxes from 'components/prefecture-checkboxes'
+import Spinner from 'components/spinner'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import React from 'react'
@@ -10,13 +11,19 @@ import { Prefecture, RESASSuccessResponse } from 'utils/resas/types'
 import styles from './index.module.css'
 
 const Home: NextPage = () => {
-  const { populationPerYear, ...func } = useCheckedPrefectures()
+  const {
+    populationPerYear,
+    isLoading: isLoadingPoplation,
+    ...func
+  } = useCheckedPrefectures()
 
-  const { data, isLoading } = useAxios<RESASSuccessResponse<Prefecture[]>>(
-    PREFETURES_FRONTEND_PATH
-  )
+  const { data, isLoading: isLoadingPrefectures } = useAxios<
+    RESASSuccessResponse<Prefecture[]>
+  >(PREFETURES_FRONTEND_PATH)
 
   const prefectures = data ? data.result : []
+
+  const PrefectureCheckboxesMemo = React.memo(PrefectureCheckboxes)
 
   return (
     <>
@@ -29,16 +36,16 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
+      <Spinner isLoading={isLoadingPoplation || isLoadingPrefectures} />
+
       <div className={styles.container}>
-        <div className={styles.checkboxes}>
-          {data ? (
-            <PrefectureCheckboxes prefectures={data.result} {...func} />
-          ) : isLoading ? (
-            <>読込中</>
-          ) : (
-            <>エラー</>
-          )}
-        </div>
+        {data ? (
+          <div className={styles.checkboxes}>
+            <PrefectureCheckboxesMemo prefectures={data.result} {...func} />
+          </div>
+        ) : (
+          <div>エラー：再読み込みしてください</div>
+        )}
 
         <div className={styles.chart}>
           <PopulationPerYearChart
