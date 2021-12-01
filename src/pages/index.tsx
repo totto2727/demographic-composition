@@ -17,9 +17,11 @@ const Home: NextPage = () => {
     ...func
   } = useCheckedPrefectures()
 
-  const { data, isLoading: isLoadingPrefectures } = useAxios<
-    RESASSuccessResponse<Prefecture[]>
-  >(PREFETURES_FRONTEND_PATH)
+  const {
+    data,
+    isLoading: isLoadingPrefectures,
+    isError,
+  } = useAxios<RESASSuccessResponse<Prefecture[]>>(PREFETURES_FRONTEND_PATH)
 
   const prefectures = data ? data.result : []
 
@@ -43,8 +45,10 @@ const Home: NextPage = () => {
           <div className={styles.checkboxes}>
             <PrefectureCheckboxesMemo prefectures={data.result} {...func} />
           </div>
-        ) : (
+        ) : isError ? (
           <div>エラー：再読み込みしてください</div>
+        ) : (
+          <></>
         )}
 
         <div className={styles.chart}>
