@@ -1,11 +1,13 @@
 @import url('bootstrap-reboot.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap');
 
 html,
 body {
+  background-color: #ffffff;
+  color: #282828;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 a {
@@ -15,4 +17,21 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+.header {
+  background-color: #282828;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+}
+
+.main {
+  padding: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+  .main {
+    padding: 1rem 5vw 0rem 5vw;
+  }
 }

@@ -1,23 +1,22 @@
 import type { AppProps } from 'next/app'
+import Head from 'next/head'
 import React from 'react'
 
 import './global.css'
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <div>
-      <header>
-        {/* TODO ヘッダーを実装*/}
-        ヘッダー
-      </header>
+    <>
+      <div>
+        <header className='header'>
+          <h1>全国の人口推移</h1>
+        </header>
 
-      <Component {...pageProps} />
-
-      <footer>
-        {/* TODO フッターを実装 */}
-        フッター
-      </footer>
-    </div>
+        <main className='main'>
+          <Component {...pageProps} />
+        </main>
+      </div>
+    </>
   )
 }
 
