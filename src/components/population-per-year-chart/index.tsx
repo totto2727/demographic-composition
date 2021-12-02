@@ -110,13 +110,16 @@ const PopulationPerYearChart: React.FC<{
   ))
 
   return (
-    <ResponsiveContainer minWidth={300} minHeight={300}>
-      <LineChart data={plotDatas}>
+    <ResponsiveContainer minWidth={300} minHeight={300} width='95%'>
+      <LineChart
+        data={plotDatas}
+        margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+      >
         <XAxis dataKey='year' tick={{ fontSize: '.7rem' }} unit='年度' />
         <YAxis tick={{ fontSize: '.7rem' }} unit='人' />
         <Tooltip />
         <Legend />
-        <CartesianGrid stroke='ccc' strokeDasharray='3 3' />
+        <CartesianGrid strokeDasharray='3 3' />
         {lines}
       </LineChart>
     </ResponsiveContainer>
